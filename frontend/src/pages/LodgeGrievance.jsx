@@ -90,7 +90,7 @@ const LodgeGrievance = () => {
   return (
     <div className="min-h-screen bg-zinc-200">
       {/* Navbar */}
-      <nav className="border-b-4 border-black bg-white px-6 py-4 flex items-center justify-between">
+      <nav className="border-b-4 border-black bg-white px-6 py-4 flex items-center justify-between top-0 sticky z-1000">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-amber-500 border-4 border-black flex items-center justify-center font-black text-lg">
             SV

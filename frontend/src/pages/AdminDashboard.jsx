@@ -201,7 +201,7 @@ const AdminDashboard = () => {
                   <thead>
                     <tr className="border-b-4 border-black bg-zinc-100">
                       <th className="px-6 py-4 text-left font-black uppercase text-sm border-r-4 border-black">
-                        Union Name
+                        Name & Email
                       </th>
                       <th className="px-6 py-4 text-left font-black uppercase text-sm border-r-4 border-black">
                         Description
@@ -281,7 +281,7 @@ const AdminDashboard = () => {
                         S.No
                       </th>
                       <th className="px-6 py-4 text-left font-black uppercase text-sm border-r-4 border-black">
-                        Worker
+                        Name & Email
                       </th>
                       <th className="px-6 py-4 text-left font-black uppercase text-sm border-r-4 border-black">
                         Description
@@ -300,7 +300,7 @@ const AdminDashboard = () => {
                         key={g._id}
                         className="border-b-2 border-zinc-200 hover:bg-zinc-50 transition-colors"
                       >
-                        <td className="px-6 py-4 font-black text-zinc-400 border-r-4 border-black">
+                        <td className="px-6 text-center py-4 font-black text-zinc-400 border-r-4 border-black">
                           {i + 1}
                         </td>
                         <td className="px-6 py-4 border-r-4 border-black">
@@ -316,7 +316,7 @@ const AdminDashboard = () => {
                             {g.description}
                           </span>
                         </td>
-                        <td className="px-6 py-4 font-bold text-sm border-r-4 border-black text-zinc-600">
+                        <td className="px-6 text-center py-4 font-bold text-sm border-r-4 border-black text-zinc-600">
                           {new Date(g.createdAt).toLocaleDateString("en-IN", {
                             day: "2-digit",
                             month: "short",
@@ -383,7 +383,7 @@ const AdminDashboard = () => {
                         key={u._id}
                         className="border-b-2 border-zinc-200 hover:bg-zinc-50 transition-colors"
                       >
-                        <td className="px-6 py-4 font-black text-zinc-400 border-r-4 border-black">
+                        <td className="px-6 text-center py-4 font-black text-zinc-400 border-r-4 border-black">
                           {i + 1}
                         </td>
                         <td className="px-6 py-4 font-black border-r-4 border-black">

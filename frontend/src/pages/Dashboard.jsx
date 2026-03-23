@@ -157,13 +157,13 @@ const Dashboard = () => {
                       key={g._id}
                       className="border-b-2 border-zinc-300 hover:bg-zinc-50 transition-colors"
                     >
-                      <td className="px-6 py-4 font-black text-zinc-500 border-r-4 border-black">
+                      <td className="px-6 text-center py-4 font-black text-zinc-500 border-r-4 border-black">
                         {i + 1}
                       </td>
                       <td className="px-6 py-4 font-medium border-r-4 border-black max-w-xs">
                         <span className="line-clamp-2">{g.description}</span>
                       </td>
-                      <td className="px-6 py-4 font-bold text-sm border-r-4 border-black text-zinc-600">
+                      <td className="px-6 text-center py-4 font-bold text-sm border-r-4 border-black text-zinc-600">
                         {new Date(g.createdAt).toLocaleDateString("en-IN", {
                           day: "2-digit",
                           month: "short",
