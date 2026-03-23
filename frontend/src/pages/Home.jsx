@@ -96,7 +96,6 @@ const Home = () => {
 
       {/* Features */}
       <div
-        className="min-h-screen"
         style={{
           backgroundImage: "url('/bg2.png')",
           backgroundSize: "cover",
@@ -104,8 +103,8 @@ const Home = () => {
           backgroundAttachment: "fixed",
         }}
       >
-        <div className="min-h-screen bg-black/40">
-          <section className="px-6 py-16 max-w-5xl mx-auto">
+        <div className=" bg-black/40">
+          <section className="px-6 py-10 max-w-5xl mx-auto">
             <h2 className="text-3xl text-white uppercase mb-10 border-b-4 border-white pb-4">
               Why Shramik Voice?
             </h2>
@@ -126,7 +125,7 @@ const Home = () => {
           </section>
 
           {/* CTA Banner */}
-          <section className="mx-6 mb-16 border-4 border-black bg-amber-500 p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-5xl md:mx-auto my-18 flex flex-col md:flex-row items-center justify-between gap-10 ">
+          <section className="mx-6 border-4 border-black bg-amber-500 p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-5xl md:mx-auto flex flex-col md:flex-row items-center justify-between gap-10 ">
             <div>
               <h2 className="text-3xl font-black uppercase">
                 Ready to raise your voice?
