@@ -35,6 +35,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/grievances", userRoutes);
 app.use("/api/admin", adminRoutes);
 
+app.use("/uploads", express.static("uploads"));
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

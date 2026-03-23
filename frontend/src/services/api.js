@@ -44,6 +44,9 @@ export const adminAPI = {
 };
 
 export const grievanceAPI = {
-  createGrievance: (data) => api.post("/grievances", data),
+  create: (formData) =>
+    api.post("/grievances", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
   getMyGrievances: () => api.get("/grievances/mine"),
 };

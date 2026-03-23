@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const grievanceSchema = new mongoose.Schema(
   {
@@ -34,8 +34,12 @@ const grievanceSchema = new mongoose.Schema(
       enum: ["Pending", "In Progress", "Resolved"],
       default: "Pending",
     },
+    image: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true },
 );
 
-export default mongoose.model("Grievance", grievanceSchema)
+export default mongoose.model("Grievance", grievanceSchema);

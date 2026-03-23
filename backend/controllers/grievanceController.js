@@ -17,6 +17,7 @@ export const createGrievance = async (req, res) => {
       description,
       category,
       status: "Pending",
+      image: req.file ? `/uploads/${req.file.filename}` : null,
     });
 
     res.status(201).json({
