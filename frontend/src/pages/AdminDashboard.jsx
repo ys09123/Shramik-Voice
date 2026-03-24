@@ -5,7 +5,7 @@ import { adminAPI } from "../services/api";
 
 const statusColors = {
   Pending: "bg-amber-400",
-  Closed: "bg-green-400",
+  Resolved: "bg-green-400",
   Rejected: "bg-red-400",
   "In Review": "bg-blue-300",
 };
@@ -163,7 +163,7 @@ const GrievanceModal = ({ grievance, onClose, onUpdate }) => {
           <div className="flex flex-col gap-2">
             <p className="font-black uppercase text-sm">Update Status</p>
             <div className="flex gap-2 flex-wrap">
-              {["Pending", "In Review", "Closed", "Rejected"].map((s) => (
+              {["Pending", "In Review", "Resolved", "Rejected"].map((s) => (
                 <button
                   key={s}
                   onClick={() => onUpdate(grievance._id, s)}
@@ -210,7 +210,7 @@ const StatusDropdown = ({ grievance, onUpdate }) => {
     >
       <option value="Pending">Pending</option>
       <option value="In Review">In Review</option>
-      <option value="Closed">Closed</option>
+      <option value="Resolved">Resolved</option>
       <option value="Rejected">Rejected</option>
     </select>
   );
@@ -286,7 +286,7 @@ const AdminDashboard = () => {
   };
 
   const pendingCount = grievances.filter((g) => g.status === "Pending").length;
-  const closedCount = grievances.filter((g) => g.status === "Closed").length;
+  const resolveCount = grievances.filter((g) => g.status === "Resolved").length;
 
   // ── Pagination helpers ──
   const paginate = (data, page) =>
@@ -358,7 +358,7 @@ const AdminDashboard = () => {
               bg: "bg-amber-400",
             },
             { label: "Pending", value: pendingCount, bg: "bg-red-500" },
-            { label: "Closed", value: closedCount, bg: "bg-green-400" },
+            { label: "Resolved", value: resolveCount, bg: "bg-green-400" },
           ].map((s, i) => (
             <div
               key={i}

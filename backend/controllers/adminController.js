@@ -74,7 +74,7 @@ export const updateGrievanceStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const allowed = ["Pending", "In Review", "Closed", "Rejected"];
+    const allowed = ["Pending", "In Review", "Resolved", "Rejected"];
 
     if (!allowed.includes(status)) {
       return res.status(400).json({

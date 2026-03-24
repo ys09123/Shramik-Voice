@@ -4,7 +4,7 @@ import { grievanceAPI } from "../services/api";
 
 const statusColors = {
   Pending: "bg-amber-400",
-  Closed: "bg-green-400",
+  Resolved: "bg-green-400",
   Rejected: "bg-red-400",
   "In Review": "bg-blue-300",
 };
@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   const total = grievances.length;
   const pending = grievances.filter((g) => g.status === "Pending").length;
-  const closed = grievances.filter((g) => g.status === "Closed").length;
+  const resolved = grievances.filter((g) => g.status === "Resolved").length;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -44,7 +44,7 @@ const Dashboard = () => {
   const stats = [
     { label: "Total Grievances", value: total, bg: "bg-white" },
     { label: "Pending", value: pending, bg: "bg-amber-400" },
-    { label: "Closed", value: closed, bg: "bg-green-400" },
+    { label: "Resolved", value: resolved, bg: "bg-green-400" },
   ];
 
   return (

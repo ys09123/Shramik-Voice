@@ -24,14 +24,14 @@ Workers can register, lodge complaints, and track their resolution status in rea
 ### Worker
 - Register and login securely
 - Lodge grievances with title, category, and description
-- Track grievance status in real time (Pending → In Review → Closed / Rejected)
-- Personal dashboard showing total, pending, and closed grievances
+- Track grievance status in real time (Pending → In Review → Resolved → Rejected)
+- Personal dashboard showing total, pending, and resolved grievances
 
 ### Admin
 - Dedicated admin dashboard with full platform overview
 - View all grievances and all registered users
 - Update grievance status directly from the dashboard
-- Stats: total users, total grievances, pending, and closed counts
+- Stats: total users, total grievances, pending, and resolved counts
 - Recent grievances overview (last 5)
 
 ---
