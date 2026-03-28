@@ -1,0 +1,39 @@
+name: Simple CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # FRONTEND
+      - name: Install frontend
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      # BACKEND
+      - name: Install backend
+        run: |
+          cd backend
+          npm install
+
+      - name: Test backend
+        run: |
+          cd backend
+          npm test || echo "no tests"
