@@ -17,14 +17,33 @@ const PAGE_SIZE = 3; // items per page
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   if (totalPages <= 1) return null;
 
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // Build page numbers to show: always first, last, current ±2, with "..." gaps
+  const getPages = () => {
+    const pages = [];
+    const delta = 2; // pages on each side of current
+
+    const left = Math.max(2, currentPage - delta);
+    const right = Math.min(totalPages - 1, currentPage + delta);
+
+    pages.push(1); // always show first
+
+    if (left > 2) pages.push("..."); // left gap
+
+    for (let i = left; i <= right; i++) pages.push(i);
+
+    if (right < totalPages - 1) pages.push("..."); // right gap
+
+    if (totalPages > 1) pages.push(totalPages); // always show last
+
+    return pages;
+  };
 
   return (
     <div className="border-t-4 border-black px-6 py-4 flex items-center justify-between bg-zinc-50">
       <p className="font-bold uppercase text-xs text-zinc-500">
         Page {currentPage} of {totalPages}
       </p>
-      <div className="flex items-center gap-0">
+      <div className="flex items-center">
         {/* Prev */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
@@ -34,27 +53,36 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           ←
         </button>
 
-        {/* Page numbers */}
-        {pages.map((p) => (
-          <button
-            key={p}
-            onClick={() => onPageChange(p)}
-            className={`border-4 border-l-0 border-black px-4 cursor-pointer py-2 font-black uppercase text-sm transition-all
-              ${
-                currentPage === p
-                  ? "bg-amber-500"
-                  : "bg-white hover:bg-zinc-100 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-              }`}
-          >
-            {p}
-          </button>
-        ))}
+        {/* Page numbers with ellipsis */}
+        {getPages().map((p, i) =>
+          p === "..." ? (
+            <span
+              key={`ellipsis-${i}`}
+              className="border-4 border-l-0 border-black px-4 py-2 font-black text-sm bg-white text-zinc-400 select-none"
+            >
+              ...
+            </span>
+          ) : (
+            <button
+              key={p}
+              onClick={() => onPageChange(p)}
+              className={`border-4 border-l-0 border-black px-4 py-2 font-black text-sm transition-all
+                ${
+                  currentPage === p
+                    ? "bg-amber-500"
+                    : "bg-white hover:bg-zinc-100 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+                }`}
+            >
+              {p}
+            </button>
+          ),
+        )}
 
         {/* Next */}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="border-4 border-l-0 border-black px-4 py-2 font-black uppercase text-sm bg-white hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+          className="border-4 border-l-0 border-black px-4 py-2 font-black uppercase text-sm bg-white hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
           →
         </button>
@@ -314,7 +342,10 @@ const AdminDashboard = () => {
       {/* Navbar */}
       <nav className="border-b-4 border-black bg-white px-6 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-black border-4 border-black flex items-center justify-center font-black text-lg text-amber-400 cursor-pointer" onClick={() => navigate("/")}>
+          <div
+            className="w-10 h-10 bg-black border-4 border-black flex items-center justify-center font-black text-lg text-amber-400 cursor-pointer"
+            onClick={() => navigate("/")}
+          >
             SV
           </div>
           <div>
@@ -328,7 +359,7 @@ const AdminDashboard = () => {
         </div>
         <button
           onClick={handleLogout}
-          className="border-4 border-black px-4 py-2 font-bold uppercase text-sm hover:bg-red-400 transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none"
+          className="border-4 border-black px-4 py-2 font-bold uppercase text-sm hover:bg-red-400 transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 cursor-pointer active:translate-y-1 active:shadow-none"
         >
           Logout
         </button>
@@ -387,8 +418,6 @@ const AdminDashboard = () => {
             </button>
           ))}
         </div>
-
-        
 
         {/* ── GRIEVANCES TAB ── */}
         {activeTab === "Grievances" && (
