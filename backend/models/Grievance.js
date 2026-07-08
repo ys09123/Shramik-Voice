@@ -39,7 +39,9 @@ const grievanceSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true },
+  { timestamps: true,
+    strict: false
+  },
 );
 
 export default mongoose.model("Grievance", grievanceSchema);

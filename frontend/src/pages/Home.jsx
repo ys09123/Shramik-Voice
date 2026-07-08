@@ -3,17 +3,14 @@ import { useNavigate } from "react-router-dom";
 
 const features = [
   {
-    icon: "✊",
     title: "Lodge a Grievance",
     desc: "Raise your workplace concerns directly and get them on record officially.",
   },
   {
-    icon: "📋",
     title: "Track Status",
     desc: "Follow your grievance from submission to resolution in real time.",
   },
   {
-    icon: "🔒",
     title: "Secure & Private",
     desc: "Your identity and complaints are protected. Speak without fear.",
   },
