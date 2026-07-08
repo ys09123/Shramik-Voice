@@ -69,10 +69,11 @@ export const getAllGrievances = async (req, res) => {
   }
 };
 
+
 export const updateGrievanceStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, remark } = req.body;
 
     const allowed = ["Pending", "In Review", "Resolved", "Rejected"];
 
@@ -82,9 +83,12 @@ export const updateGrievanceStatus = async (req, res) => {
       });
     }
 
+    const updatePayload = { status };
+    if (remark !== undefined) updatePayload.remark = remark;
+
     const grievance = await Grievance.findByIdAndUpdate(
       id,
-      { status },
+      updatePayload,
       { returnDocument: "after" },
     );
 
@@ -104,5 +108,20 @@ export const updateGrievanceStatus = async (req, res) => {
       message: "Server error",
       error: err.message,
     });
+  }
+};
+
+export const deleteGrievance = async (req, res) => {
+  try {
+    const grievance = await Grievance.findByIdAndDelete(req.params.id);
+
+    if (!grievance) {
+      return res.status(404).json({ message: "Grievance not found." });
+    }
+
+    res.json({ success: true, message: "Grievance deleted successfully." });
+  } catch (err) {
+    console.error("Delete grievance error: ", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };

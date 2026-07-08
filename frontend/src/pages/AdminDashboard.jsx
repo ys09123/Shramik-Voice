@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { adminAPI } from "../services/api";
+import Navbar from "../components/Navbar";
 
 const statusColors = {
   Pending: "bg-amber-400",
@@ -92,8 +93,25 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 };
 
 // ── Grievance Detail Modal ──────────────────────────────────────────
-const GrievanceModal = ({ grievance, onClose, onUpdate }) => {
+const GrievanceModal = ({ grievance, onClose, onUpdate, onDelete }) => {
   if (!grievance) return null;
+  const [deleting, setDeleting] = useState(false);
+  const [remark, setRemark] = useState(grievance.remark || "");
+
+  const handleDeleteClick = async () => {
+    if (!window.confirm("Permanently delete this grievance? This cannot be undone.")) return;
+    setDeleting(true);
+    try {
+      await adminAPI.deleteGrievance(grievance._id);
+      toast.success("Grievance deleted.");
+      onDelete(grievance._id);
+      onClose();
+    } catch (err) {
+      toast.error("Failed to delete grievance.");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div
@@ -187,6 +205,23 @@ const GrievanceModal = ({ grievance, onClose, onUpdate }) => {
             </div>
           </div>
 
+          {/* Remark */}
+          <div className="flex flex-col gap-2">
+            <label className="font-black uppercase text-sm">
+              Admin Remark
+              <span className="font-medium text-zinc-400 text-xs ml-2 normal-case">
+                (sent with status update)
+              </span>
+            </label>
+            <textarea
+              value={remark}
+              onChange={(e) => setRemark(e.target.value)}
+              rows={3}
+              placeholder="Add a note for the worker e.g. reason for rejection, next steps..."
+              className="w-full border-4 border-black bg-zinc-50 px-4 py-3 font-medium text-sm resize-none outline-none focus:bg-amber-50 transition-colors placeholder:text-zinc-400"
+            />
+          </div>
+
           {/* Update Status */}
           <div className="flex flex-col gap-2">
             <p className="font-black uppercase text-sm">Update Status</p>
@@ -194,9 +229,9 @@ const GrievanceModal = ({ grievance, onClose, onUpdate }) => {
               {["Pending", "In Review", "Resolved", "Rejected"].map((s) => (
                 <button
                   key={s}
-                  onClick={() => onUpdate(grievance._id, s)}
+                  onClick={() => onUpdate(grievance._id, s, remark)}
                   className={`${statusColors[s]} border-4 border-black px-4 py-2 font-black uppercase text-xs
-                    shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all
+                    shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer
                     ${grievance.status === s ? "ring-4 ring-black ring-offset-2" : "opacity-70 hover:opacity-100"}`}
                 >
                   {s}
@@ -204,6 +239,15 @@ const GrievanceModal = ({ grievance, onClose, onUpdate }) => {
               ))}
             </div>
           </div>
+
+          {/* Delete */}
+          <button
+            onClick={handleDeleteClick}
+            disabled={deleting}
+            className="w-full border-4 border-black bg-zinc-900 text-white hover:bg-red-600 py-3 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {deleting ? "Deleting..." : "🗑 Delete Grievance Permanently"}
+          </button>
         </div>
       </div>
     </div>
@@ -255,6 +299,11 @@ const AdminDashboard = () => {
   const [error, setError] = useState("");
   const [selectedGrievance, setSelectedGrievance] = useState(null);
 
+  // Search & filter state
+  const [grievanceSearch, setGrievanceSearch] = useState("");
+  const [grievanceStatusFilter, setGrievanceStatusFilter] = useState("All");
+  const [userSearch, setUserSearch] = useState("");
+
   // Separate page state for each tab
   const [grievancePage, setGrievancePage] = useState(1);
   const [userPage, setUserPage] = useState(1);
@@ -286,20 +335,36 @@ const AdminDashboard = () => {
     setUserPage(1);
   };
 
-  const handleStatusUpdate = async (id, newStatus) => {
+  // Reset page on search / filter change
+  const handleGrievanceSearch = (val) => {
+    setGrievanceSearch(val);
+    setGrievancePage(1);
+  };
+  const handleGrievanceFilter = (val) => {
+    setGrievanceStatusFilter(val);
+    setGrievancePage(1);
+  };
+  const handleUserSearch = (val) => {
+    setUserSearch(val);
+    setUserPage(1);
+  };
+
+  const handleStatusUpdate = async (id, newStatus, remark = "") => {
     try {
-      await adminAPI.updateStatus(id, newStatus);
+      await adminAPI.updateStatus(id, newStatus, remark);
       setGrievances((prev) =>
-        prev.map((g) => (g._id === id ? { ...g, status: newStatus } : g)),
+        prev.map((g) =>
+          g._id === id ? { ...g, status: newStatus, remark } : g,
+        ),
       );
       setStats((prev) => ({
         ...prev,
         recentGrievances: prev?.recentGrievances?.map((g) =>
-          g._id === id ? { ...g, status: newStatus } : g,
+          g._id === id ? { ...g, status: newStatus, remark } : g,
         ),
       }));
       setSelectedGrievance((prev) =>
-        prev?._id === id ? { ...prev, status: newStatus } : prev,
+        prev?._id === id ? { ...prev, status: newStatus, remark } : prev,
       );
       toast.success("Status updated!");
     } catch (err) {
@@ -307,24 +372,54 @@ const AdminDashboard = () => {
     }
   };
 
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/login");
   };
 
+  const handleDelete = (id) => {
+    setGrievances((prev) => prev.filter((g) => g._id !== id));
+  };
+
   const pendingCount = grievances.filter((g) => g.status === "Pending").length;
   const resolveCount = grievances.filter((g) => g.status === "Resolved").length;
+  const inReviewCount = grievances.filter((g) => g.status === "In Review").length;
+  const rejectedCount = grievances.filter((g) => g.status === "Rejected").length;
+
+  // ── Filtered lists ──
+  const filteredGrievances = grievances.filter((g) => {
+    const q = grievanceSearch.toLowerCase();
+    const matchesSearch =
+      !q ||
+      g.title?.toLowerCase().includes(q) ||
+      g.user?.name?.toLowerCase().includes(q) ||
+      g.user?.email?.toLowerCase().includes(q) ||
+      g.category?.toLowerCase().includes(q);
+    const matchesStatus =
+      grievanceStatusFilter === "All" || g.status === grievanceStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredUsers = users.filter((u) => {
+    const q = userSearch.toLowerCase();
+    return (
+      !q ||
+      u.name?.toLowerCase().includes(q) ||
+      u.email?.toLowerCase().includes(q)
+    );
+  });
 
   // ── Pagination helpers ──
   const paginate = (data, page) =>
     data.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const totalGrievancePages = Math.ceil(grievances.length / PAGE_SIZE);
-  const totalUserPages = Math.ceil(users.length / PAGE_SIZE);
+  const totalGrievancePages = Math.ceil(filteredGrievances.length / PAGE_SIZE);
+  const totalUserPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
 
-  const paginatedGrievances = paginate(grievances, grievancePage);
-  const paginatedUsers = paginate(users, userPage);
+  const paginatedGrievances = paginate(filteredGrievances, grievancePage);
+  const paginatedUsers = paginate(filteredUsers, userPage);
 
   const rowClass =
     "border-b-2 border-zinc-200 hover:bg-amber-50 transition-colors cursor-pointer";
@@ -336,34 +431,12 @@ const AdminDashboard = () => {
           grievance={selectedGrievance}
           onClose={() => setSelectedGrievance(null)}
           onUpdate={handleStatusUpdate}
+          onDelete={handleDelete}
         />
       )}
 
       {/* Navbar */}
-      <nav className="border-b-4 border-black bg-white px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 bg-black border-4 border-black flex items-center justify-center font-black text-lg text-amber-400 cursor-pointer"
-            onClick={() => navigate("/")}
-          >
-            SV
-          </div>
-          <div>
-            <span className="font-black text-xl uppercase tracking-tight">
-              Shramik Voice
-            </span>
-            <span className="ml-3 bg-amber-500 border-2 border-black px-2 py-0.5 text-xs font-black uppercase">
-              Admin
-            </span>
-          </div>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="border-4 border-black px-4 py-2 font-bold uppercase text-sm hover:bg-red-400 transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 cursor-pointer active:translate-y-1 active:shadow-none"
-        >
-          Logout
-        </button>
-      </nav>
+      <Navbar variant="admin" onLogout={handleLogout} />
 
       <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
         <div>
@@ -380,7 +453,7 @@ const AdminDashboard = () => {
         )}
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
             { label: "Total Users", value: stats?.totalUsers, bg: "bg-white" },
             {
@@ -388,8 +461,10 @@ const AdminDashboard = () => {
               value: stats?.totalGrievances,
               bg: "bg-amber-400",
             },
-            { label: "Pending", value: pendingCount, bg: "bg-red-500" },
+            { label: "Pending", value: pendingCount, bg: "bg-red-400" },
+            { label: "In Review", value: inReviewCount, bg: "bg-blue-300" },
             { label: "Resolved", value: resolveCount, bg: "bg-green-400" },
+            { label: "Rejected", value: rejectedCount, bg: "bg-zinc-800 text-white" },
           ].map((s, i) => (
             <div
               key={i}
@@ -422,19 +497,48 @@ const AdminDashboard = () => {
         {/* ── GRIEVANCES TAB ── */}
         {activeTab === "Grievances" && (
           <div className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <div className="border-b-4 border-black px-6 py-4 flex items-center justify-between">
+            <div className="border-b-4 border-black px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <h2 className="font-black text-2xl uppercase">All Grievances</h2>
               <span className="font-bold text-sm uppercase text-zinc-500">
-                {grievances.length} total — click to view
+                {filteredGrievances.length} of {grievances.length} — click to view
               </span>
+            </div>
+            {/* Search & Filter Bar */}
+            <div className="border-b-4 border-black px-6 py-4 flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                value={grievanceSearch}
+                onChange={(e) => handleGrievanceSearch(e.target.value)}
+                placeholder="SEARCH BY NAME, TITLE, CATEGORY..."
+                className="flex-1 h-11 border-4 border-black bg-zinc-100 px-4 font-bold uppercase text-sm outline-none focus:bg-amber-100 transition-colors placeholder:text-zinc-400"
+              />
+              <select
+                value={grievanceStatusFilter}
+                onChange={(e) => handleGrievanceFilter(e.target.value)}
+                className="h-11 border-4 border-black bg-white px-4 font-black uppercase text-sm outline-none cursor-pointer focus:bg-amber-100 transition-colors"
+              >
+                <option value="All">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="In Review">In Review</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+              {(grievanceSearch || grievanceStatusFilter !== "All") && (
+                <button
+                  onClick={() => { handleGrievanceSearch(""); handleGrievanceFilter("All"); }}
+                  className="h-11 border-4 border-black px-4 font-black uppercase text-sm bg-zinc-200 hover:bg-red-400 transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  ✕ Clear
+                </button>
+              )}
             </div>
             {loading ? (
               <div className="px-6 py-16 text-center font-black uppercase text-zinc-400 text-xl">
                 Loading...
               </div>
-            ) : grievances.length === 0 ? (
+            ) : filteredGrievances.length === 0 ? (
               <div className="px-6 py-16 text-center font-black uppercase text-zinc-400 text-xl">
-                No grievances filed yet.
+                {grievances.length === 0 ? "No grievances filed yet." : "No results match your search."}
               </div>
             ) : (
               <>
@@ -514,19 +618,37 @@ const AdminDashboard = () => {
         {/* ── USERS TAB ── */}
         {activeTab === "Users" && (
           <div className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <div className="border-b-4 border-black px-6 py-4 flex items-center justify-between">
+            <div className="border-b-4 border-black px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <h2 className="font-black text-2xl uppercase">All Users</h2>
               <span className="font-bold text-sm uppercase text-zinc-500">
-                {users.length} registered
+                {filteredUsers.length} of {users.length} registered
               </span>
+            </div>
+            {/* Search Bar */}
+            <div className="border-b-4 border-black px-6 py-4 flex gap-3">
+              <input
+                type="text"
+                value={userSearch}
+                onChange={(e) => handleUserSearch(e.target.value)}
+                placeholder="SEARCH BY NAME OR EMAIL..."
+                className="flex-1 h-11 border-4 border-black bg-zinc-100 px-4 font-bold uppercase text-sm outline-none focus:bg-amber-100 transition-colors placeholder:text-zinc-400"
+              />
+              {userSearch && (
+                <button
+                  onClick={() => handleUserSearch("")}
+                  className="h-11 border-4 border-black px-4 font-black uppercase text-sm bg-zinc-200 hover:bg-red-400 transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  ✕ Clear
+                </button>
+              )}
             </div>
             {loading ? (
               <div className="px-6 py-16 text-center font-black uppercase text-zinc-400 text-xl">
                 Loading...
               </div>
-            ) : users.length === 0 ? (
+            ) : filteredUsers.length === 0 ? (
               <div className="px-6 py-16 text-center font-black uppercase text-zinc-400 text-xl">
-                No users registered yet.
+                {users.length === 0 ? "No users registered yet." : "No users match your search."}
               </div>
             ) : (
               <>

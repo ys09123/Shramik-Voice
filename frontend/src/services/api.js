@@ -39,8 +39,9 @@ export const adminAPI = {
   getStats: () => api.get("/admin/stats"),
   getAllGrievances: () => api.get("/admin/grievances"),
   getAllUsers: () => api.get("/admin/users"),
-  updateStatus: (id, status) =>
-    api.patch(`/admin/grievances/${id}/status`, { status }),
+  updateStatus: (id, status, remark = "") =>
+    api.patch(`/admin/grievances/${id}/status`, { status, remark }),
+  deleteGrievance: (id) => api.delete(`/admin/grievances/${id}`),
 };
 
 export const grievanceAPI = {
@@ -49,4 +50,5 @@ export const grievanceAPI = {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   getMyGrievances: () => api.get("/grievances/mine"),
+  withdraw: (id) => api.delete(`/grievances/${id}`),
 };

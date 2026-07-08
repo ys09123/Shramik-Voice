@@ -1,16 +1,20 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 const features = [
   {
+    icon: "📋",
     title: "Lodge a Grievance",
     desc: "Raise your workplace concerns directly and get them on record officially.",
   },
   {
+    icon: "🔍",
     title: "Track Status",
     desc: "Follow your grievance from submission to resolution in real time.",
   },
   {
+    icon: "🔒",
     title: "Secure & Private",
     desc: "Your identity and complaints are protected. Speak without fear.",
   },
@@ -22,33 +26,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-zinc-200 font-sans">
       {/* Navbar */}
-      <nav className="border-b-4 sticky top-0 z-1000 border-black bg-white px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-amber-500 border-4 border-black flex items-center justify-center font-black text-lg">
-            SV
-          </div>
-          <span
-            className="font-black cursor-pointer text-xl uppercase tracking-tight"
-            onClick={() => navigate("/")}
-          >
-            Shramik Voice
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate("/login")}
-            className="border-4 border-black px-5 py-2 font-bold uppercase text-sm hover:bg-zinc-100 transition-colors cursor-pointer"
-          >
-            Login
-          </button>
-          <button
-            onClick={() => navigate("/register")}
-            className="border-4 border-black px-5 py-2 font-bold uppercase text-sm bg-amber-500 hover:bg-amber-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer"
-          >
-            Register
-          </button>
-        </div>
-      </nav>
+      <Navbar variant="public" />
 
       {/* Hero */}
       <section className="px-6 py-20 flex flex-col items-center text-center border-b-4 border-black bg-white relative overflow-hidden">

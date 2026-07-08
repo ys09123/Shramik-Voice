@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { grievanceAPI } from "../services/api";
 import toast from "react-hot-toast";
+import Navbar from "../components/Navbar";
 
 const categories = [
   "Wages & Salary",
@@ -120,22 +121,7 @@ const LodgeGrievance = () => {
   return (
     <div className="min-h-screen bg-zinc-200">
       {/* Navbar */}
-      <nav className="border-b-4 border-black bg-white px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-amber-500 border-4 border-black flex items-center justify-center font-black text-lg">
-            SV
-          </div>
-          <span className="font-black text-xl uppercase tracking-tight">
-            Shramik Voice
-          </span>
-        </div>
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="border-4 border-black px-4 py-2 font-bold uppercase text-sm hover:bg-zinc-100 transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 cursor-pointer active:translate-y-1 active:shadow-none"
-        >
-          ← Back
-        </button>
-      </nav>
+      <Navbar variant="back" />
 
       <div className="max-w-5xl mx-auto px-6 py-10">
         <div className="border-4 border-black bg-zinc-300 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">

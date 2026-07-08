@@ -38,6 +38,10 @@ const grievanceSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    remark: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true,
     strict: false
